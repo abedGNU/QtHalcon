@@ -1,4 +1,6 @@
 #include "qhwindow.h"
+#include <QEvent>
+#include <QMouseEvent>
 
 QHWindow::QHWindow(QWidget *parent, long Width, long Height) : QWidget(parent)
 {
@@ -29,5 +31,9 @@ void QHWindow::showImage(HalconCpp::HImage img)
 
 void QHWindow::mousePressEvent(QMouseEvent *event)
 {
-    emit mouseClic();
+    if (event->button() == Qt::LeftButton)
+    {
+        qDebug()<<"QHwindows mouse left clicked";
+        emit mouseClic();
+    }
 }

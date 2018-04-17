@@ -38,6 +38,8 @@ private:
     HalconCpp::HRegion drawShape(Global::eDrawShape shape);
     bool roiAddActive=false;
     bool roiCutActive = false;
+    bool drawActive=false; // draw in progress
+    int regionCounter=0;
 };
 
 #endif // MATCHING_H

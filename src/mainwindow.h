@@ -28,6 +28,8 @@ private slots:
 
     void on_pbMatching_clicked();
 
+    void on_pbExit_clicked();
+
 private:
 
 };

@@ -1,4 +1,9 @@
 <RCC>
     <qresource prefix="/images"/>
     <qresource prefix="/translations"/>
+    <qresource prefix="/icons">
+        <file>icons/add.svg</file>
+        <file>icons/quit.svg</file>
+        <file>icons/remove.svg</file>
+    </qresource>
 </RCC>

@@ -7,12 +7,13 @@ MatchingUi::MatchingUi(QWidget *parent) :
 {
     try{
         setupUi(this);
-        connect(pbAddRoi,SIGNAL(clicked(bool)), this, SLOT(mouseClicked()) );
+        hwind = new QHWindow();
+        vlHwindows->addWidget(hwind);
+
+        connect(pbAddRoi,SIGNAL(clicked()), this, SLOT(mouseClicked()) );
         connect(pbDeleteRoi, SIGNAL(clicked()), this, SLOT(mouseClicked())  );
         connect(hwind, SIGNAL(mouseClic()), this, SLOT(mouseClicked() ) );
 
-        hwind = new QHWindow();
-        vlHwindows->addWidget(hwind);
         hwind->show();
     }
     catch( QException &e)
@@ -48,6 +49,8 @@ void MatchingUi::on_pbDeleteAll_clicked()
     hwind->ClearWindow();
 
     hwind->showImage(imgGrabbed);
+    roiAddActive= roiCutActive=false;
+    regionCounter=0;
 }
 
 HalconCpp::HRegion MatchingUi::drawShape(Global::eDrawShape shape)
@@ -103,15 +106,21 @@ void MatchingUi::on_pbAddAll_clicked()
     if(imgGrabbed.IsInitialized())
     {
         selectedRegion.GenRectangle1(0,0, (double)imgGrabbed.Height(), (double)imgGrabbed.Width());
+        hwind->DispObj(selectedRegion);
+        regionCounter=1;
     }
+    roiAddActive= roiCutActive=false;
 }
 
 void MatchingUi::mouseClicked()
 {
     try
     {
-        if(roiCutActive | roiAddActive)
+        if((roiCutActive | roiAddActive) & !drawActive)
         {
+            drawActive = true;
+            regionCounter++;
+            qDebug()<< "Region No. " << regionCounter;
             HalconCpp::HRegion regTemp = drawShape(Global::eDrawShape(cmbRoiShape->currentIndex()));
             if (!selectedRegion.IsInitialized())
             {
@@ -127,6 +136,7 @@ void MatchingUi::mouseClicked()
             hwind->ClearWindow();
             hwind->showImage(imgGrabbed);
             hwind->DispObj(selectedRegion);
+            drawActive = false;
         }
     }
     catch(HalconCpp::HException &ex)
