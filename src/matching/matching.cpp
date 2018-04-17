@@ -1,6 +1,7 @@
 #include "matching.h"
 #include <QDebug>
 #include <QException>
+#include <QFile>
 
 MatchingUi::MatchingUi(QWidget *parent) :
     QWidget(parent)
@@ -10,7 +11,8 @@ MatchingUi::MatchingUi(QWidget *parent) :
         hwind = new QHWindow();
         vlHwindows->addWidget(hwind);
 
-        initValues();
+        initValues(false);
+
         connect(pbAddRoi,SIGNAL(clicked()), this, SLOT(mouseClicked()) );
         connect(pbDeleteRoi, SIGNAL(clicked()), this, SLOT(mouseClicked())  );
         connect(hwind, SIGNAL(mouseClic()), this, SLOT(mouseClicked() ) );
@@ -29,7 +31,7 @@ MatchingUi::MatchingUi(QWidget *parent) :
 void MatchingUi::on_pbGrabImage_clicked()
 {
     roiAddActive = roiCutActive = false;
-    imgGrabbed.ReadImage("Matchimage");
+    imgGrabbed.ReadImage("green-dot");
     selectedRegion.GenEmptyObj();
     clearAndShow();
 
@@ -229,14 +231,52 @@ void MatchingUi::clearAndShow(int arg1)
     }
 }
 
-void MatchingUi::initValues()
+void MatchingUi::initValues(bool readModel)
 {
-    spinUpperThreshold->setValue(20);
-    spinLowerThreshold->setValue(10);
+    numLevels =HAuto;
+    optimization =HAuto;
+    metric="use_polarity";
+    subPixel="least_squares";
 
-    spinBoxMinSize->setValue(30);
+    if (! readModel)
+    {
+        contrast[0]=10; contrast[1]=20; contrast[2]=30; minContrast =HAuto;
+        angleStart = -M_PI; angleExtent = M_PI; angleStep=HAuto;
+        scaleMin=0.9; scaleMax=1.1;scaleStep=HAuto;
 
-    contrast[0]=10; contrast[1]=20; contrast[2]=30;
+        minScore=0.5;
+        numMatches=1;
+        maxOverlap=0.9;
+        greediness=0.9;
+    }
+    // Contrast
+    spinUpperThreshold->setValue(contrast[1]);
+    spinLowerThreshold->setValue(contrast[0]);
+    spinBoxMinSize->setValue(contrast[2]);
+
+    // Angles
+    spinStartAngle->setValue( (int)qRadiansToDegrees(angleStart) );
+    spinEndAngle->setValue((int)qRadiansToDegrees(angleExtent));
+    if (angleStep==HAuto)
+        spinStepAngle->setValue(0);
+
+    // Scale
+    spinMinScale->setValue( (int)(scaleMin*100) );
+    spinMaxScale->setValue((int)(scaleMax*100));
+
+    // Min  Score
+    spinMinScore->setValue((int)(minScore*100));
+
+    // Number of matches
+    spinNumMatchs->setValue(numMatches);
+
+    // max overlap
+    spinMaxOverlap->setValue((int)(maxOverlap*100));
+    // Greediness
+    spinGreediness->setValue((int)(greediness*100));
+
+    // subpixel
+    cmbSubpixel->setCurrentText("least_squares");
 }
 
 void MatchingUi::inspectModel()
@@ -267,6 +307,11 @@ void MatchingUi::createModel()
             shapeModel= imgReduced.CreateScaledShapeModel(numLevels, angleStart, angleExtent,
                                                           angleStep, scaleMin, scaleMax,
                                                           scaleStep, optimization, metric, contrast, minContrast);
+            qDebug()<< "Model created" << "NumLevels="<<numLevels.ToString()
+                    << " Angle start " << qRadiansToDegrees(angleStart) << " angleExtent=" << qRadiansToDegrees(angleExtent)
+                    << " angleStep=" << angleStep.ToString() << " scaleMin="<< scaleMin << " scaleMax " << scaleMax
+                    << " scaleStep=" << scaleStep.ToString() <<  " optimization=" << optimization.ToString()
+                    << " metric=" << metric.Text() << " contrast="<< contrast.ToString() <<" minContrast=" << minContrast.ToString();
         }
     }
     catch(HalconCpp::HException &ex)
@@ -284,6 +329,13 @@ void MatchingUi::findModel()
                                         scaleMin, scaleMax, minScore,numMatches,
                                         maxOverlap, subPixel, numLevel, greediness,
                                         &row, &col, &angle, &scale, &score);
+        qDebug()<< " Angle start " << qRadiansToDegrees(angleStart) << " angleExtent=" << qRadiansToDegrees(angleExtent)
+                << " scaleMin="<< scaleMin << " scaleMax " << scaleMax
+                << "minScore="<<minScore<< "numMatches="<<numMatches
+                <<"maxOverlap="<<maxOverlap<< "subPixel"<<subPixel.ToString()
+               << "numLevel="<<numLevel.ToString()<<"greediness="<< greediness
+               <<"row=" <<row.ToString() << "col="<<col.ToString()<< "angle="<< angle.ToString()
+              << "scale="<< scale.ToString()<< "score="<< score.ToString();
 
         HalconCpp::HXLDCont xldCont =shapeModel.GetShapeModelContours(1);
         // tranfermo to new position
@@ -292,21 +344,22 @@ void MatchingUi::findModel()
         hom_mat2d_scale (HomMat2DRotate, Scale[I], Scale[I], Row[I], Column[I], HomMat2DScale)
         affine_trans_contour_xld (ModelContours, ModelTrans, HomMat2DScale)
         */
-        qDebug()<< "Number of matches= " << score.Length();
-        if (score.Length())
+        qDebug()<< "Number of matches found= " << score.Length();
+        // hwind->DispObj(xldCont);
+        clearAndShow(1);
+        if (score.Length()>0)
         {
             HalconCpp::HHomMat2D matrix;
             matrix.HomMat2dIdentity();
 
             HalconCpp::HTuple xldRow=0, xldCol=0, xldAngle=0;
-            for(int i=0;score.Length()-1; i++)
+            for(int i=0;i < score.Length(); i++)
             {
                 matrix.VectorAngleToRigid((double)xldRow[i],xldCol[i],xldAngle[i], row[i], col[i], angle[i]);
                 matrix = matrix.HomMat2dScale((double)scale[i],scale[i],row[i],col[i]);
-                xldCont=matrix.AffineTransContourXld(xldCont);
+                HalconCpp::HXLDCont xldContTrans=matrix.AffineTransContourXld(xldCont);
 
-                clearAndShow(1);
-                hwind->DispObj(xldCont);
+                hwind->DispObj(xldContTrans);
             }
         }
     }
@@ -315,6 +368,64 @@ void MatchingUi::findModel()
         qDebug() << ex.ErrorCode() << ex.ErrorMessage();
     }
 
+}
+
+void MatchingUi::writeModel()
+{
+    shapeModel.WriteShapeModel(modelFullName.toStdString().c_str());
+    qDebug()<< "model Saved in : " << modelFullName;
+    //
+    imgGrabbed.WriteImage(imgExt.toStdString().c_str(),0, imgFullName.toStdString().c_str() );
+    imgReduced.WriteImage(imgExt.toStdString().c_str(),0,imgReducedFullName.toStdString().c_str());
+    selectedRegion.WriteRegion(regionFullName.toStdString().c_str());
+}
+
+void MatchingUi::readModel()
+{
+    if(QFile::exists(modelFullName) )
+    {
+        shapeModel.ReadShapeModel(modelFullName.toStdString().c_str());
+        qDebug() << "Read model file " << modelFullName;
+
+        double rowRefModel, colRefModel;
+        shapeModel.GetShapeModelOrigin(&rowRefModel, &colRefModel);
+        double angleStepD, scaleStepD;
+        Hlong minContrastL;
+        // GetShapeModelParams(double* AngleStart, double* AngleExtent, double* AngleStep,
+        //double* ScaleMin, double* ScaleMax, double* ScaleStep, HString* Metric, Hlong* MinContrast) const;
+        shapeModel.GetShapeModelParams(&angleStart, &angleExtent, &angleStepD,
+                                       &scaleMin, &scaleMax, &scaleStepD,
+                                       &metric, &minContrastL);
+        angleStep = angleStepD;
+        scaleStep = scaleStepD;
+        minContrast=minContrastL;
+        initValues(true);
+        qDebug()<< " Angle start " << qRadiansToDegrees(angleStart) << " angleExtent=" << qRadiansToDegrees(angleExtent)
+                << " angleStep=" << angleStepD << " scaleMin="<< scaleMin << " scaleMax " << scaleMax
+                << " scaleStep=" << scaleStepD
+                << " metric=" << metric.Text() <<" minContrast=" << minContrastL;
+    }
+    else
+        qDebug()<< "File" << modelFullName << " dosen't exist";
+
+    if (QFile::exists(imgFullNameExt))
+    {
+        imgGrabbed.ReadImage( imgFullName.toStdString().c_str() );
+        qDebug() << "Read image from" << imgFullNameExt;
+
+    }
+    if (QFile::exists(imgReducedFullNameExt))
+    {
+        imgReduced.ReadImage(imgReducedFullName.toStdString().c_str());
+         qDebug() << "Read reduced image from" << imgReducedFullNameExt;
+    }
+    if(QFile::exists(regionFullNameExt))
+    {
+        selectedRegion.ReadRegion(regionFullName.toStdString().c_str());
+          qDebug() << "Read region from" << regionFullNameExt;
+    }
+    clearAndShow();
+    inspectModel();
 }
 
 
@@ -422,4 +533,14 @@ void MatchingUi::on_cobSubpixel_currentIndexChanged(const QString &arg1)
 {
     subPixel[0] = arg1.toStdString().c_str();
     qDebug()<< arg1;
+}
+
+void MatchingUi::on_pushButton_clicked()
+{
+    writeModel();
+}
+
+void MatchingUi::on_pbReadModelFile_clicked()
+{
+    readModel();
 }

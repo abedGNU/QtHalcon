@@ -172,7 +172,7 @@
         <item>
          <widget class="QToolBox" name="toolBox">
           <property name="currentIndex">
-           <number>0</number>
+           <number>1</number>
           </property>
           <widget class="QWidget" name="page">
            <property name="geometry">
@@ -469,7 +469,7 @@
                 <number>100</number>
                </property>
                <property name="value">
-                <number>90</number>
+                <number>50</number>
                </property>
               </widget>
              </item>
@@ -550,7 +550,7 @@
               </widget>
              </item>
              <item>
-              <widget class="QComboBox" name="cobSubpixel">
+              <widget class="QComboBox" name="cmbSubpixel">
                <item>
                 <property name="text">
                  <string>none</string>
@@ -688,6 +688,19 @@
      </widget>
     </item>
    </layout>
+  </widget>
+  <widget class="QPushButton" name="pbReadModelFile">
+   <property name="geometry">
+    <rect>
+     <x>460</x>
+     <y>20</y>
+     <width>111</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Read model file</string>
+   </property>
   </widget>
  </widget>
  <resources/>

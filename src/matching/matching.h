@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QList>
 #include <QtMath>
+#include <QString>
 
 #include "ui_matching.h"
 
@@ -23,7 +24,7 @@ public:
     HalconCpp::HRegion selectedRegion;
     HalconCpp::HRegion modelRegion;
     HalconCpp::HShapeModel shapeModel;
-   // int test1;
+    // int test1;
 
 private slots:
     void on_pbGrabImage_clicked();
@@ -71,6 +72,10 @@ private slots:
 
     void on_cobSubpixel_currentIndexChanged(const QString &arg1);
 
+    void on_pushButton_clicked();
+
+    void on_pbReadModelFile_clicked();
+
 private:
     HalconCpp::HRegion drawShape(Global::eDrawShape shape);
     bool roiAddActive=false;
@@ -81,26 +86,54 @@ private:
 
     void clearAndShow();
     void clearAndShow(int arg1);
-    void initValues();
+    void initValues(bool readModel);
 
     void inspectModel();
     void createModel();
     void findModel();
     void writeModel();
+    void readModel();
 
     HalconCpp::HTuple HAuto = "auto";
-    HalconCpp::HTuple numLevels =HAuto;
-    double angleStart=-M_PI; double angleExtent=2*M_PI; HalconCpp::HTuple angleStep = HAuto;
-    double scaleMin=0.9; double scaleMax=1.1; HalconCpp::HTuple scaleStep =HAuto;
-    HalconCpp::HTuple optimization =HAuto;
-    HalconCpp::HString metric="use_polarity";
+    HalconCpp::HTuple numLevels;
+
+    double angleStart; double angleExtent; HalconCpp::HTuple angleStep;
+    double scaleMin; double scaleMax; HalconCpp::HTuple scaleStep;
+
+    HalconCpp::HTuple optimization;
+    HalconCpp::HString metric;
     HalconCpp::HTuple contrast; // Htuple containing [lowerThreshold, UpperThreshold, MinSizeContrast]
-    HalconCpp::HTuple minContrast =HAuto;
+    HalconCpp::HTuple minContrast;
 
 
-    double minScore=0.9; Hlong numMatches=1; double maxOverlap=0.9; HalconCpp::HTuple subPixel="none";
-    double greediness=1;
+    double minScore; Hlong numMatches; double maxOverlap;
+    HalconCpp::HTuple subPixel;
+    double greediness;
+
     HalconCpp::HTuple row , col, angle, scale, score;
+    QString path = qApp->applicationDirPath()+"/";
+    QString modelName="model", ext=".shm";
+    //const char *modelFullName=(path+modelName+ext).toStdString().c_str();
+    QString modelFullName=path+modelName+ext;
+    QString imageName= "image", imageReducedName= "imagereduced", imgExt="bmp";
+    QString selcectRegionName="selectedregion", regExt="HOBJ";
+    /*
+    const char *imgFullName=(path+imageName+imgExt).toStdString().c_str();
+    const char *imgReducedFullName=(path+imageReducedName+imgExt).toStdString().c_str();
+    const char *regionFullName=(path+selcectRegionName).toStdString().c_str();
+    const char *imageExt = imgExt.toStdString().c_str();
+*/
+    QString imgFullName=path+imageName;
+    QString imgFullNameExt=path+imageName+"."+imgExt;
+
+    QString imgReducedFullName=path+imageReducedName;
+    QString imgReducedFullNameExt=path+imageReducedName+"."+imgExt;
+
+    QString regionFullName=path+selcectRegionName;
+    QString regionFullNameExt=path+selcectRegionName+"."+regExt;
+
+   // QString imageExt = imgExt;
+
 };
 
 #endif // MATCHING_H
