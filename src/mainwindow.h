@@ -19,7 +19,7 @@ public:
     SettingsUi *settings;
     MatchingUi *matching;
 
-    appSettings appSett;
+    //appSettings appSett;
 
 private slots:
     void on_pbCamera_clicked();

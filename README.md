@@ -9,3 +9,4 @@
 
 #### Opencv 3
     https://opencv.org/
+# QtHalcon
