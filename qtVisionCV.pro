@@ -31,47 +31,74 @@ INCLUDEPATH += $$PWD/. \
             src/calibration \
             src/roi \
             src/communication \
-            src/utilities
+            src/utilities \
+            src/graphics \
+            src/testclasses
 
 SOURCES += \
         src/main.cpp \
         src/mainwindow.cpp \
         src/communication/plc_siemens.cpp \
         src/communication/snap7.cpp \
-        src/matching/matching.cpp \
         src/communication/step7_settings.cpp \
-        src/utilities/qhwindow.cpp \
+        src/graphics/qhwindow.cpp \
         src/appsettings.cpp \
+        src/productionui.cpp \
+        src/settingsui.cpp \
+        src/utilities/explorer.cpp \
+        src/matching/matchingui.cpp \
+        src/matching/matching.cpp \
+        src/matching/matchingparameters.cpp \
+        src/camera/cameraparam.cpp \
+        src/global.cpp \
+        src/utilities/inputdialog.cpp \
+        src/camera/camera.cpp \
         src/camera/cameraui.cpp \
-    src/calibration/calibrationui.cpp \
-    src/roi/roiui.cpp \
-    src/productionui.cpp \
-    src/settingsui.cpp
+        src/graphics/qviewgraphics.cpp \
+        src/utilities/imageconvertion.cpp \
+        src/testclasses/testgraphicsview.cpp \
+        src/graphics/qenhancedgraphicsview.cpp \
+        #src/graphics/view.cpp \
+        src/calibration/calibrationui.cpp \
+        src/calibration/calibration.cpp
 
 HEADERS += \
         src/mainwindow.h \
-    src/communication/plc_siemens.h \
-    src/communication/snap7.h \
-    src/matching/matching.h \
-    src/communication/step7_settings.h \
-    src/utilities/qhwindow.h \
-    src/appsettings.h \
-    src/camera/cameraui.h \
-    src/calibration/calibrationui.h \
-    src/roi/roiui.h \
-    src/productionui.h \
-    src/settingsui.h \
-    src/global.h
+        src/communication/plc_siemens.h \
+        src/communication/snap7.h \
+        src/communication/step7_settings.h \
+        src/graphics/qhwindow.h \
+        src/appsettings.h \
+        src/productionui.h \
+        src/settingsui.h \
+        src/global.h \
+        src/utilities/explorer.h \
+        src/matching/matchingui.h \
+        src/matching/matching.h \
+        src/matching/matchingparameters.h \
+        src/camera/cameraparam.h \
+        src/utilities/inputdialog.h \
+        src/camera/camera.h \
+        src/camera/cameraui.h \
+        src/graphics/qviewgraphics.h \
+        src/utilities/imageconvertion.h \
+        src/testclasses/testgraphicsview.h \
+        src/graphics/qenhancedgraphicsview.h \
+        #src/graphics/view.h \
+        src/calibration/calibrationui.h \
+        src/calibration/calibration.h
 
 FORMS += \
     src/mainwindow.ui \
     src/settings.ui \
-    src/camera/camera.ui \
-    src/calibration/calibration.ui \
-    src/matching/matching.ui \
-    src/roi/roi.ui \
     src/production.ui \
-    src/communication/step7_settings.ui
+    src/communication/step7_settings.ui \
+    src/utilities/inputdialog.ui \
+    src/camera/cameraui.ui \
+    src/matching/matchingui.ui \
+    src/graphics/qviewgraphics.ui \
+    src/testclasses/testgraphicsview.ui \
+    src/calibration/calibrationui.ui
 
 TRANSLATIONS = ts/ts_it.ts \
                ts/ts_cn.ts

@@ -17,10 +17,11 @@ QHWindow::QHWindow(QWidget *parent, long Width, long Height) : QWidget(parent)
 void QHWindow::showImage(HalconCpp::HImage img)
 {
     try{
-        if (img.IsInitialized())
+        if (img.Height() >= 1)//img.IsInitialized())
         {
             SetPart(0,0, img.Height()-1, img.Width()-1);
             DispObj(img);
+            //qDebug()<< "Image grabbed" ;
         }
     }
     catch(HalconCpp::HException &ex)

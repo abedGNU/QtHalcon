@@ -5,5 +5,9 @@
         <file>icons/add.svg</file>
         <file>icons/quit.svg</file>
         <file>icons/remove.svg</file>
+        <file>icons/rotateleft.png</file>
+        <file>icons/rotateright.png</file>
+        <file>icons/zoomin.png</file>
+        <file>icons/zoomout.png</file>
     </qresource>
 </RCC>

@@ -5,7 +5,9 @@
 #include <QMainWindow>
 #include "cameraui.h"
 #include "settingsui.h"
-#include "matching.h"
+#include "matchingui.h"
+#include "testgraphicsview.h"
+#include "calibrationui.h"
 
 #include "appsettings.h"
 
@@ -18,7 +20,9 @@ public:
     CameraUi *camera;
     SettingsUi *settings;
     MatchingUi *matching;
+    TestGraphicsView *gv;
 
+    CalibrationUi *calibration;
     //appSettings appSett;
 
 private slots:
@@ -29,6 +33,8 @@ private slots:
     void on_pbMatching_clicked();
 
     void on_pbExit_clicked();
+
+    void on_pbCalibration_clicked();
 
 private:
 

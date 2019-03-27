@@ -40,3 +40,5 @@ CMakeLists.txt.user*
 # windows
 *.db
 *.db:encryptable
+
+/res/dataRep
